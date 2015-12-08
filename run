@@ -1,0 +1,5 @@
+#!/bin/bash
+tmpdir=`mktemp -d`
+processing-java --sketch=`pwd` --output=$tmpdir --force --run
+sleep 0.1
+rm -rf $tmpdir
