@@ -33,3 +33,8 @@ void mouseReleased() {
   space.mouseReleased();
 }
 
+void mouseWheel(MouseEvent event) {
+  float e = event.getCount();
+	space.zoom(e == -1);
+}
+
