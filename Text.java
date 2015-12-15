@@ -19,7 +19,7 @@ public class Text {
   }
 
   void mousePressed() {
-    if (vp.contains()) {
+    if (vp.containsMouse()) {
       bckBtn.mousePressed();
       fwdBtn.mousePressed();
     }

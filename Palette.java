@@ -45,5 +45,7 @@ public final class Palette {
 
   public static Color get(int i) { return get(i,0); }
 
+  public static Color RED = Color.RED;
+
 }
 

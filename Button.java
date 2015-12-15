@@ -41,7 +41,7 @@ public class Button {
   void setPress(boolean val) { this.pressed = val; }
 
   void mousePressed() {
-    if (vp.contains()) setPress(true);
+    if (vp.containsMouse()) setPress(true);
   }
 
 }

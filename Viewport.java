@@ -17,10 +17,17 @@ public class Viewport {
     this.p = parent.p;
   }
   
-  Viewport(PApplet parent) { _init(parent, 0, 0, 1, 1, 0); }
-  Viewport(Viewport parent, float _x, float _y, float _w, float _h) { _init(parent,_x,_y,_w,_h,0); }
+  Viewport(Viewport parent, float _x, float _y, float _w, float _h) { _init(parent,_x,_y,_w,_h,(float)0.0); }
   Viewport(Viewport parent, double _x, double _y, double _w, double _h) {
     _init(parent, (float)_x, (float)_y, (float)_w, (float)_h, (float)0);
+  }
+  Viewport(PApplet parent) {
+    this._x = (float)0.0;
+    this._y = (float)0.0;
+    this._w = (float)1.0;
+    this._h = (float)1.0;
+    this.zoom = (float)0.0;
+    this.p = parent;
   }
 
   // rel == relative == fraction from 0 to 1 of viewport width / height:
@@ -49,13 +56,40 @@ public class Viewport {
   // Does this Viewport contain the given point (posX, posY)?
   //    posX: x-position in window pixels
   //    posY: y-position in window pixels
-  boolean contains(int posX, int posY) {
+  boolean containsRel(int posX, int posY) {
+    // TODO: have this call contains()? (relative computation)
     return (posX >= x()) && (posX <= x() + w())
         && (posY >= y()) && (posY <= y() + h());
   }
 
-  // Implicitly does the current mouse press contain me?
-  boolean contains() { return this.contains(p.mouseX, p.mouseY); }
+  boolean contains(float posX, float posY) {
+    return (posX >= 0.0) && (posX <= 1.0) && (posY >= 0.0) && (posY <= 1.0);
+  }
+
+  boolean containsMouse() {
+    return contains(toRelX(p.mouseX), toRelY(p.mouseY));
+  }
+
+  boolean circleContains(float queryX, float queryY, float posX, float posY, float radius) {
+    float x0 = queryX - posX;
+    float y0 = queryY - posY;
+    return (x0*x0) + (y0*y0) < (radius*radius);
+  }
+  
+  // posX and poxY are in coordinates relative to this Viewport.
+  boolean circleContainsMouse(float posX, float posY, float radius) {
+    return circleContains(toRelX(p.mouseX), toRelY(p.mouseY), posX, posY, radius);
+  }
+
+  // Draw an ellipse given relative coordinates as input.
+  void ellipse(float posX, float posY, float e1, float e2) {
+    this.p.ellipse(toAbsX(posX), toAbsY(posY), toAbsXLen(e1), toAbsYLen(e2));
+  }
+
+  void circle(float posX, float posY, float r) {
+    // TODO: don't just assume r is relative to x-width
+    this.p.ellipse(toAbsX(posX), toAbsY(posY), toAbsXLen(r), toAbsXLen(r));
+  }
 
   // Not to be confused with p.fill() - fill a rectangle corresponding to
   // this Viewport with the given color.
@@ -70,8 +104,12 @@ public class Viewport {
   float toRelY(float val) { return (val - y()) / h(); }
   
   // Converting relative to absolute is affected by the current zoom level:
-  float toAbsX(float val) { return x() + val * w(); }
-  float toAbsY(float val) { return y() + val * h(); }
+  float toAbsX(float val) { return x() + toAbsXLen(val); }
+  float toAbsY(float val) { return y() + toAbsYLen(val); }
+
+  // Calculate an absolute length given a relative value val:
+  float toAbsXLen(float val) { return val * w(); }
+  float toAbsYLen(float val) { return val * h(); }
 
   void changeZoom(boolean zoomIn) {
     zoom += (zoomIn ? -1 : 1);

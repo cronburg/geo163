@@ -1,12 +1,16 @@
 import processing.core.*;
 import java.awt.geom.Line2D;
+import java.awt.Color;
 
 public class Point {
   float x;     // x-pos relative to viewport
   float y;     // y-pos relative to viewport
   PApplet p;
-  Viewport vp;
+  Viewport vp;  // The viewport this point belongs to (Viewport is larger)
   float radius; // radius of the point (absolute position value for now)
+  
+  // whether or not we are hovering over this point (valid after drawing)
+  boolean mouseContains;
 
   private void _init(Viewport vp, float x, float y, float r) {
     this.vp = vp;
@@ -14,14 +18,23 @@ public class Point {
     this.x = x;
     this.y = y;
     this.radius = r;
+    this.mouseContains = false;
   }
   
-  Point(Viewport vp, float x, float y) { _init(vp, x, y, 10); }
+  Point(Viewport vp, float x, float y) { _init(vp, x, y, (float)0.02); }
   Point(Viewport vp, float x, float y, float r) { _init(vp, x, y, r); }
 
-  void draw() {
-    p.fill(0);
-    p.ellipse(vp.toAbsX(x), vp.toAbsY(y), radius, radius);
+  void draw(Color hovorColor) {
+    mouseContains = false;
+    if (vp.circleContainsMouse(x, y, radius)) {
+      p.fill(hovorColor.getRGB());
+      mouseContains = true;
+    } else {
+      p.fill(Palette.get(3,3).getRGB()); // color inside circle
+      p.stroke(Palette.get(3,3).getRGB()); // color around edge of circle
+
+    }
+    vp.circle(x, y, radius);
   }
 
   // Draw a line from this point to another point:
