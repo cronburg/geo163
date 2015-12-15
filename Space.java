@@ -26,7 +26,7 @@ public class Space {
       state = State.PRECOMPUTE;
     } else if (room.badTentative) {
       // TODO: Put this in a text box:
-      p.print("Hey! That line intersects with an existing one\n");
+      p.print("Hey! That line intersects with an existing one ");
       p.print("or is too close to another point. Try again.\n");
     } else {
       Point lastPoint = new Point(vp, vp.toRelX(p.mouseX), vp.toRelY(p.mouseY));

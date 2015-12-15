@@ -49,8 +49,10 @@ public class Polygon {
     drawInternalPoint(a, hovorColor);
   }
 
+  // Update badTentative and stroke color based on whether or not new line segment is feasible:
   private void checkLineSegment(boolean cndn, Point a, Point b, Point tentative, Point last) {
-    if (cndn && Point.segmentsIntersect(a, b, tentative, last)) {
+    // !closed because only make RED if not closed
+    if (!closed && cndn && Point.segmentsIntersect(a, b, tentative, last)) {
       p.stroke(intersectColor.getRGB());
       badTentative = true;
     } else {
@@ -74,7 +76,9 @@ public class Polygon {
 
     // Draw just first point without setting badTentative:
     a = points.get(0); b = points.get(1);
+    
     checkLineSegment(points.size() > 2, a, b, tentativePoint, lastPoint);
+    
     a.drawLineTo(b);
     a.draw(Palette.get(3,1));
 
