@@ -1,3 +1,3 @@
 public enum State {
-  SELECT, PRECOMPUTE
+  SELECT, MAKEGUARD, PRECOMPUTE
 }

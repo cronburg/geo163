@@ -1,6 +1,7 @@
 import processing.core.*;
 import java.util.ArrayList;
 import java.awt.Color;
+import java.util.Collections;
 
 public class Polygon {
  
@@ -107,6 +108,42 @@ public class Polygon {
   // Open / close the polygon.
   void close() { this.closed = true; }
   void open()  { this.closed = false; }
+
+  // Get the point with the maximum x-value:
+  Point getMaxX() {
+    Point m = points.get(0); // TODO empty polygon
+    for (int i = 1; i < points.size(); i++) {
+      if (m.x < points.get(i).x) m = points.get(i);
+    }
+    return m;
+  }
+  Point getMaxY() {
+    Point m = points.get(0);
+    for (int i = 1; i < points.size(); i++) {
+      if (m.y < points.get(i).y) m = points.get(i);
+    }
+    return m;
+  }
+
+  // Does this polygon contain the given point?
+  boolean contains(Point p) {
+    if (!closed) {
+      this.p.print("WARNING: Testing if a non-closed polygon contains a point...\n");
+      return false;
+    }
+
+    // Ad-hoc point "at infinity":
+    Point inf = new Point(vp, getMaxX().x * 2, getMaxY().y * 2);
+
+    int count = 0;
+    for (int i = 0; i < points.size() - 1; i++) {
+      count += Point.segmentsIntersect(points.get(i), points.get(i+1), p, inf) ? 1 : 0;
+    }
+    count += Point.segmentsIntersect(points.get(points.size() - 1), points.get(0), p, inf) ? 1 : 0;
+    //this.p.print("count = " + this.p.str(count) + "\n");
+
+    return (count % 2) == 1; // Odd number of crossings == inside (JCT)
+  }
 
 }
 

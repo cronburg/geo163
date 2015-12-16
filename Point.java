@@ -24,6 +24,12 @@ public class Point {
   Point(Viewport vp, float x, float y) { _init(vp, x, y, (float)0.02); }
   Point(Viewport vp, float x, float y, float r) { _init(vp, x, y, r); }
 
+  // Macro for auto-converting window coordinates to relative coordinates
+  // when creating a new point:
+  static Point newAbsPoint(Viewport vp, int x, int y) {
+    return new Point(vp, vp.toRelX(x), vp.toRelY(y));
+  }
+
   void draw(Color hovorColor) {
     mouseContains = false;
     if (vp.circleContainsMouse(x, y, radius)) {
@@ -37,6 +43,9 @@ public class Point {
     vp.circle(x, y, radius);
   }
 
+  // TODO: magic color...
+  void draw() { draw(Palette.get(3,3)); }
+  
   // Draw a line from this point to another point:
   void drawLineTo(Point b) {
     p.line( vp.toAbsX(this.x), vp.toAbsY(this.y)
@@ -53,5 +62,7 @@ public class Point {
     Line2D s2 = new Line2D.Float(c.x, c.y, d.x, d.y);
     return s2.intersectsLine(s1);
   }
+
+  Point copy() { return new Point(vp, x, y, radius); }
 
 }

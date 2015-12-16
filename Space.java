@@ -8,35 +8,51 @@ public class Space {
   State state;
 
   Polygon room; // The room with all the art!
+  Robot guard;  // The robot guard!
 
-  Point selectPoint;
+  // The current location of the mouse in coordinates relative to the Viewport of
+  // this space. This point is allowed to be outside of the Viewport (i.e. x and y
+  // need not be in the interval [0,1])
+  Point mousePoint;
 
   Space(Viewport vp) {
     this.vp = vp;
     this.p = vp.p;
     this.state = State.SELECT;
     this.room = new Polygon(vp);
-    this.selectPoint = new Point(vp, (float)0.0, (float)0.0);
+    this.mousePoint = new Point(vp, (float)0.0, (float)0.0);
+    this.guard = null;
   }
 
   // Called when in SELECT state and we clicked inside of this space:
   void newPoint() {
     if (!room.badTentative && room.willNewPointClosePolygon()) {
       room.close();
-      state = State.PRECOMPUTE;
+      state = State.MAKEGUARD;
     } else if (room.badTentative) {
       // TODO: Put this in a text box:
       p.print("Hey! That line intersects with an existing one ");
       p.print("or is too close to another point. Try again.\n");
     } else {
-      Point lastPoint = new Point(vp, vp.toRelX(p.mouseX), vp.toRelY(p.mouseY));
+      Point lastPoint = Point.newAbsPoint(vp, p.mouseX, p.mouseY);
       room.add(lastPoint);
+    }
+  }
+
+  // Called when in MAKEGUARD state and we clicked:
+  void makeGuard() {
+    // TODO 
+    if (room.contains(mousePoint)) {
+      guard = new Robot(mousePoint.copy());
+    } else {
+      p.print("The selected point is not inside the polygon. Please try again.\n");
     }
   }
 
   void mousePressed() {
     if (vp.containsMouse()) {
       if (state == State.SELECT) newPoint();
+      if (state == State.MAKEGUARD) makeGuard();
     }
   }
 
@@ -47,17 +63,22 @@ public class Space {
 
   void draw() {
     vp.drawBorder();
-    selectPoint.setAbsX(p.mouseX);
-    selectPoint.setAbsY(p.mouseY);
+    mousePoint.setAbsX(p.mouseX);
+    mousePoint.setAbsY(p.mouseY);
     if (vp.containsMouse()) {
       if (state == State.SELECT) {
-        selectPoint.draw(Palette.get(3,3));
+        mousePoint.draw(Palette.get(3,3));
         if (room.points.size() > 0) {
-          selectPoint.drawLineTo(room.points.get(room.points.size() - 1));
+          mousePoint.drawLineTo(room.points.get(room.points.size() - 1));
+        }
+      } else if (state == State.MAKEGUARD) {
+        if (room.contains(mousePoint)) {
+          mousePoint.draw(Palette.get(3,3)); // Draw the potential guard
         }
       }
     }
-    room.draw(selectPoint);
+    room.draw(mousePoint);
+    if (null != guard) guard.draw();
   }
 
 }
