@@ -2,6 +2,7 @@ import processing.core.*;
 import java.util.ArrayList;
 import java.awt.Color;
 import java.util.Collections;
+import java.util.Stack;
 
 public class Polygon {
  
@@ -81,7 +82,7 @@ public class Polygon {
     checkLineSegment(points.size() > 2, a, b, tentativePoint, lastPoint);
     
     a.drawLineTo(b);
-    a.draw(Palette.get(3,1));
+    //a.draw(Palette.get(3,1)); // Draw first point last so no line overlap
 
     // Draw all but first and last point:
     for (int i = 1; i < points.size() - 1; i++) {
@@ -101,8 +102,13 @@ public class Polygon {
     // Draw the last point in the polygon (not the new / tentative point)
     // and possibly the closing edge:
     Point last = points.get(points.size() - 1);
+    if (closed) {
+      p.stroke(lineColor.getRGB());
+      last.drawLineTo(points.get(0));
+    }
+    // Draw first and last point last so no line overlap:
+    points.get(0).draw(Palette.get(3,1));
     drawInternalPoint(last, Palette.get(3,1));
-    if (closed) last.drawLineTo(points.get(0));
   }
 
   // Open / close the polygon.
@@ -137,16 +143,31 @@ public class Polygon {
     //p.drawLineTo(inf); // Draw infinite ray for debugging
 
     int count = 0;
-    for (int i = 0; i < points.size() - 1; i++) {
-      count += Point.segmentsIntersect(points.get(i), points.get(i+1), p, inf) ? 1 : 0;
+    for (int i = 0; i < points.size(); i++) {
+      count += Point.segmentsIntersect(getPoint(i), getPoint(i+1), p, inf) ? 1 : 0;
     }
-    count += Point.segmentsIntersect(points.get(points.size() - 1), points.get(0), p, inf) ? 1 : 0;
+    //count += Point.segmentsIntersect(points.get(points.size() - 1), points.get(0), p, inf) ? 1 : 0;
     this.p.print("count = " + this.p.str(count) + "\n");
 
     return (count % 2) == 1; // Odd number of crossings == inside (JCT)
   }
 
   boolean contains(float x, float y) { return contains(new Point(vp,x,y)); }
+
+  // Get the i-th point in the polygon (circular ArrayList):
+  Point getPoint(int i) { return points.get(i % points.size()); }
+
+  // Compute the visibility polygon of a point inside this polygon:
+  Polygon computeVisibility(Point pos) {
+    Stack edgeStack = new Stack<Edge>();
+    Point a, b;
+    for (int i = 0; i < points.size(); i++) {
+      a = points.get(i);
+      b = points.get(i + 1);
+    }
+    // TODO: return...
+    return new Polygon(vp);
+  }
 
 }
 
