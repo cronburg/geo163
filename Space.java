@@ -44,6 +44,7 @@ public class Space {
     // TODO 
     if (room.contains(mousePoint)) {
       guard = new Robot(mousePoint.copy());
+      guard.pos.setConstraint(room); // Constrain the guard's position to be inside the polygon
     } else {
       p.print("The selected point is not inside the polygon. Please try again.\n");
     }
@@ -79,6 +80,15 @@ public class Space {
     }
     room.draw(mousePoint);
     if (null != guard) guard.draw();
+  }
+
+  void keyPressed(int keyCode) {
+    if (state == State.PRECOMPUTE) {
+      if      (p.UP    == keyCode) guard.goUp();
+      else if (p.DOWN  == keyCode) guard.goDown();
+      else if (p.LEFT  == keyCode) guard.goLeft();
+      else if (p.RIGHT == keyCode) guard.goRight();
+    }
   }
 
 }

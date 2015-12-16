@@ -4,13 +4,15 @@ public class Text {
   
   Viewport vp;
   PApplet p;
-  
+  Space space;
+
   Button bckBtn; // Go back
   Button fwdBtn; // Go forwards
 
-  Text(Viewport vp) {
+  Text(Viewport vp, Space s) {
     this.vp = vp;
     this.p = vp.p;
+    this.space = s;
 
     Viewport bckVP = new Viewport(vp, 0.01, 0.90, 0.48, 0.09);
     Viewport fwdVP = new Viewport(vp, 0.51, 0.90, 0.48, 0.09);
@@ -22,6 +24,9 @@ public class Text {
     if (vp.containsMouse()) {
       bckBtn.mousePressed();
       fwdBtn.mousePressed();
+    }
+    if (fwdBtn.pressed && space.state == State.MAKEGUARD) {
+      space.state = State.PRECOMPUTE;
     }
   }
   

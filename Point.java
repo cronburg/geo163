@@ -11,6 +11,8 @@ public class Point {
   
   // whether or not we are hovering over this point (valid after drawing)
   boolean mouseContains;
+  
+  Polygon constraint; // possible constraint on point location (must be inside poly)
 
   private void _init(Viewport vp, float x, float y, float r) {
     this.vp = vp;
@@ -19,6 +21,7 @@ public class Point {
     this.y = y;
     this.radius = r;
     this.mouseContains = false;
+    this.constraint = null;
   }
   
   Point(Viewport vp, float x, float y) { _init(vp, x, y, (float)0.02); }
@@ -64,5 +67,21 @@ public class Point {
   }
 
   Point copy() { return new Point(vp, x, y, radius); }
+
+  // Adjust our position by the given delta (relative coordinates):
+  // return: whether or not we actually performed the move.
+  boolean moveDelta(float dx, float dy) {
+    float newX = x + dx;
+    float newY = y + dy;
+    if (null != this.constraint && !constraint.contains(newX, newY)) {
+      return false;
+    }
+    p.print("x = " + p.str(x) + ", y = " + p.str(y) + "\n");
+    this.x = newX;
+    this.y = newY;
+    return true;
+  }
+
+  void setConstraint(Polygon p) { this.constraint = p; }
 
 }

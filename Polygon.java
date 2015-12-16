@@ -134,16 +134,19 @@ public class Polygon {
 
     // Ad-hoc point "at infinity":
     Point inf = new Point(vp, getMaxX().x * 2, getMaxY().y * 2);
+    //p.drawLineTo(inf); // Draw infinite ray for debugging
 
     int count = 0;
     for (int i = 0; i < points.size() - 1; i++) {
       count += Point.segmentsIntersect(points.get(i), points.get(i+1), p, inf) ? 1 : 0;
     }
     count += Point.segmentsIntersect(points.get(points.size() - 1), points.get(0), p, inf) ? 1 : 0;
-    //this.p.print("count = " + this.p.str(count) + "\n");
+    this.p.print("count = " + this.p.str(count) + "\n");
 
     return (count % 2) == 1; // Odd number of crossings == inside (JCT)
   }
+
+  boolean contains(float x, float y) { return contains(new Point(vp,x,y)); }
 
 }
 

@@ -2,8 +2,8 @@
 Viewport root    = new Viewport(this);
 Viewport vpText  = new Viewport(root, 0.01, 0.01, 0.38, 0.98);
 Viewport vpSpace = new Viewport(root, 0.40, 0.01, 0.58, 0.98);
-Text text   = new Text(vpText);
 Space space = new Space(vpSpace);
+Text text   = new Text(vpText, space);
 
 void setup() {
   background(255);
@@ -36,5 +36,9 @@ void mouseReleased() {
 void mouseWheel(MouseEvent event) {
   float e = event.getCount();
 	space.zoom(e == -1);
+}
+
+void keyPressed() {
+  space.keyPressed(keyCode);
 }
 
