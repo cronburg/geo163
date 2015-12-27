@@ -3,6 +3,14 @@ Computational Geometry Final Project
 
 Comp 163 @ Tufts.
 
+System Requirements:
+--------------------
+- processing-java
+- mktemp
+
+To run this, you need to clone this repository into a directory
+named 'geo', then cd into the repo and run './run'.
+
 Currently you can select a chain of points to form a polygon
 (which you must then close off). The chain polygon must be
 simple. You can then place a point inside of the polygon to
