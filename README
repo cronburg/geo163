@@ -2,3 +2,22 @@ Computational Geometry Final Project
 ====================================
 
 Comp 163 @ Tufts.
+
+Currently you can select a chain of points to form a polygon
+(which you must then close off). The chain polygon must be
+simple. You can then place a point inside of the polygon to
+be the guard, after which a visibility polygon is computed.
+Clicking 'continue' then allows you to use the arrow keys to
+move the guard around, adjusting the visibility polygon
+accordingly.
+
+Work TODO to finish project:
+- second player
+- explanation of an optimal dynamic visibility polygon algorithm?
+
+Future Work:
+- Zoom in/out of space with polygon
+- Smooth guard velocity based on key press / release timing
+- Save / load polygons
+- Port to javascript
+

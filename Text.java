@@ -26,7 +26,7 @@ public class Text {
       fwdBtn.mousePressed();
     }
     if (fwdBtn.pressed && space.state == State.MAKEGUARD) {
-      space.state = State.PRECOMPUTE;
+      space.state = State.COMPUTE_VIS;
     }
   }
   

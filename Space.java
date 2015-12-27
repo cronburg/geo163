@@ -1,4 +1,5 @@
 import processing.core.*;
+import java.awt.Color;
 
 public class Space {
 
@@ -8,7 +9,7 @@ public class Space {
   State state;
 
   Polygon room; // The room with all the art!
-  Robot guard;  // The robot guard!
+  Guard guard;  // The robot guard!
 
   // The current location of the mouse in coordinates relative to the Viewport of
   // this space. This point is allowed to be outside of the Viewport (i.e. x and y
@@ -35,16 +36,26 @@ public class Space {
       p.print("or is too close to another point. Try again.\n");
     } else {
       Point lastPoint = Point.newAbsPoint(vp, p.mouseX, p.mouseY);
+      //lastPoint.setHover(true);
+      lastPoint.setLabel(true);
       room.add(lastPoint);
     }
   }
 
+  // Runs the visibility polygon computation for our guard:
+  // Not in Guard because guard might eventually not be allowed to
+  // see entire room / polygon:
+  void updateVisibility() {
+    guard.vis = room.computeVisibility(guard.pos);
+    //guard.vis.lineColor = Palette.get(1);
+  }
+
   // Called when in MAKEGUARD state and we clicked:
   void makeGuard() {
-    // TODO 
     if (room.contains(mousePoint)) {
-      guard = new Robot(mousePoint.copy());
+      guard = new Guard(mousePoint.copy());
       guard.pos.setConstraint(room); // Constrain the guard's position to be inside the polygon
+      updateVisibility();
     } else {
       p.print("The selected point is not inside the polygon. Please try again.\n");
     }
@@ -70,7 +81,7 @@ public class Space {
       if (state == State.SELECT) {
         mousePoint.draw(Palette.get(3,3));
         if (room.points.size() > 0) {
-          mousePoint.drawLineTo(room.points.get(room.points.size() - 1));
+          mousePoint.drawLineTo(room.points.get(room.points.size() - 1), Color.BLACK);
         }
       } else if (state == State.MAKEGUARD) {
         if (room.contains(mousePoint)) {
@@ -82,12 +93,18 @@ public class Space {
     if (null != guard) guard.draw();
   }
 
+  void keyReleased(int keyCode) {
+    //TODO
+  }
+
   void keyPressed(int keyCode) {
-    if (state == State.PRECOMPUTE) {
+    if (state == State.COMPUTE_VIS) {
       if      (p.UP    == keyCode) guard.goUp();
       else if (p.DOWN  == keyCode) guard.goDown();
       else if (p.LEFT  == keyCode) guard.goLeft();
       else if (p.RIGHT == keyCode) guard.goRight();
+      
+      updateVisibility();
     }
   }
 

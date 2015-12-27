@@ -11,7 +11,7 @@ void setup() {
   surface.setResizable(true);
 
   PFont mono = createFont("fonts/UbuntuMono-B.ttf", 32);
-  textFont(mono);
+  //textFont(mono);
 
 }
 
@@ -40,5 +40,9 @@ void mouseWheel(MouseEvent event) {
 
 void keyPressed() {
   space.keyPressed(keyCode);
+}
+
+void keyReleased() {
+  space.keyReleased(keyCode);
 }
 

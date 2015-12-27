@@ -50,6 +50,16 @@ public class Viewport {
     p.rect(x(), y(), w(), h());
   }
 
+  // Draw given text as hover-text over the current mouse location:
+  void hoverText(String txt) {
+    p.fill(0);
+    p.textSize(12);
+    p.textAlign(p.LEFT, p.BOTTOM);
+    p.text(txt, p.mouseX + 10, p.mouseY + 10); // TODO
+  }
+
+  void text(String txt, float xPos, float yPos) { p.text(txt, (int)toAbsX(xPos), (int)toAbsY(yPos)); }
+
   float centerX() { return x() + (float)(w() / 2.0); }
   float centerY() { return y() + (float)(h() / 2.0); }
 
@@ -99,7 +109,7 @@ public class Viewport {
     p.rect(x(), y(), w(), h());
   }
 
-  // Absolute window posotion to relative conversion (relative to the current viewport)
+  // Absolute window position to relative conversion (relative to the current viewport)
   float toRelX(float val) { return (val - x()) / w(); }
   float toRelY(float val) { return (val - y()) / h(); }
   
