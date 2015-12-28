@@ -31,16 +31,24 @@ public class Viewport {
   }
 
   // rel == relative == fraction from 0 to 1 of viewport width / height:
-  public float getrelX() {return _x;}
-  public float getrelY() {return _y;}
-  public float getrelW() {return _w;}
-  public float getrelH() {return _h;}
+  private float getrelX() {return _x;}
+  private float getrelY() {return _y;}
+  private float getrelW() {return _w;}
+  private float getrelH() {return _h;}
 
   // Get coordinates based on current screen width / height
   public float x() {return p.width  * _x;}
   public float y() {return p.height * _y;}
   public float w() {return p.width  * _w;}
   public float h() {return p.height * _h;}
+  
+  // Instance variables _x, _y, _w, and _h should NOT be used below this line!
+  // --------------------------------------------------------------------------
+  
+  void changeZoom(boolean zoomIn) {
+    zoom += (zoomIn ? -1 : 1);
+  }
+
 
   // TODO: setters?
 
@@ -120,10 +128,6 @@ public class Viewport {
   // Calculate an absolute length given a relative value val:
   float toAbsXLen(float val) { return val * w(); }
   float toAbsYLen(float val) { return val * h(); }
-
-  void changeZoom(boolean zoomIn) {
-    zoom += (zoomIn ? -1 : 1);
-  }
 
 }
 

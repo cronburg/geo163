@@ -14,20 +14,20 @@ public class Space {
   // The current location of the mouse in coordinates relative to the Viewport of
   // this space. This point is allowed to be outside of the Viewport (i.e. x and y
   // need not be in the interval [0,1])
-  Point mousePoint;
+  GeoPoint mousePoint;
 
   Space(Viewport vp) {
     this.vp = vp;
     this.p = vp.p;
     this.state = State.SELECT;
     this.room = new Polygon(vp);
-    this.mousePoint = new Point(vp, (float)0.0, (float)0.0);
+    this.mousePoint = new GeoPoint(vp, (float)0.0, (float)0.0);
     this.guard = null;
   }
 
   // Called when in SELECT state and we clicked inside of this space:
   void newPoint() {
-    if (!room.badTentative && room.willNewPointClosePolygon()) {
+    if (!room.badTentative && room.willNewGeoPointClosePolygon()) {
       room.close();
       state = State.MAKEGUARD;
     } else if (room.badTentative) {
@@ -35,7 +35,7 @@ public class Space {
       p.print("Hey! That line intersects with an existing one ");
       p.print("or is too close to another point. Try again.\n");
     } else {
-      Point lastPoint = Point.newAbsPoint(vp, p.mouseX, p.mouseY);
+      GeoPoint lastPoint = GeoPoint.newAbsGeoPoint(vp, p.mouseX, p.mouseY);
       //lastPoint.setHover(true);
       lastPoint.setLabel(true);
       room.add(lastPoint);

@@ -3,7 +3,7 @@ import java.awt.geom.Line2D;
 import java.awt.Color;
 import java.util.*;
 
-public class Point implements Comparable<Point> {
+public class GeoPoint implements Comparable<GeoPoint> {
   float x;     // x-pos relative to viewport
   float y;     // y-pos relative to viewport
   PApplet p;
@@ -33,9 +33,9 @@ public class Point implements Comparable<Point> {
     this.label = false;
   }
   
-  Point(Viewport vp, float x, float y) { _init(vp, x, y, (float)0.02); }
-  Point(Viewport vp, float x, float y, float r) { _init(vp, x, y, r); }
-  Point(float x, float y) { _init(null, x, y, (float)0.02); }
+  GeoPoint(Viewport vp, float x, float y) { _init(vp, x, y, (float)0.02); }
+  GeoPoint(Viewport vp, float x, float y, float r) { _init(vp, x, y, r); }
+  GeoPoint(float x, float y) { _init(null, x, y, (float)0.02); }
 
   void setHover(boolean val) { this.hover = val; }
   void setLabel(boolean val) { this.label = val; }
@@ -47,8 +47,8 @@ public class Point implements Comparable<Point> {
 
   // Macro for auto-converting window coordinates to relative coordinates
   // when creating a new point:
-  static Point newAbsPoint(Viewport vp, int x, int y) {
-    return new Point(vp, vp.toRelX(x), vp.toRelY(y));
+  static GeoPoint newAbsGeoPoint(Viewport vp, int x, int y) {
+    return new GeoPoint(vp, vp.toRelX(x), vp.toRelY(y));
   }
 
   void draw(Color hovorColor) {
@@ -76,20 +76,20 @@ public class Point implements Comparable<Point> {
   void draw() { draw(Palette.get(3,3)); }
   
   // Draw a line from this point to another point:
-  void drawLineTo(Point b, Color c) {
+  void drawLineTo(GeoPoint b, Color c) {
     p.stroke(c.getRGB()); // TODO color
     p.line( vp.toAbsX(this.x), vp.toAbsY(this.y)
           , vp.toAbsX(b.x), vp.toAbsY(b.y));
   }
 
   // Distance from this point to another:
-  float distance(Point b) { return p.sqrt(p.pow(b.x - x, 2) + p.pow(b.y - y, 2)); }
+  float distance(GeoPoint b) { return p.sqrt(p.pow(b.x - x, 2) + p.pow(b.y - y, 2)); }
 
   void setAbsX(float absX) { this.x = vp.toRelX(absX); }
   void setAbsY(float absY) { this.y = vp.toRelY(absY); }
 
   // Whether or not line segments (a,b) and (c,d) intersect:
-  static boolean segmentsIntersect(Point a, Point b, Point c, Point d) {
+  static boolean segmentsIntersect(GeoPoint a, GeoPoint b, GeoPoint c, GeoPoint d) {
     // TODO: not library code
     Line2D s1 = new Line2D.Float(a.x, a.y, b.x, b.y);
     Line2D s2 = new Line2D.Float(c.x, c.y, d.x, d.y);
@@ -98,28 +98,28 @@ public class Point implements Comparable<Point> {
 
   // Like segmentsIntersect, but ignore case where the intersection point is at one of
   // the given points. (general position assumed)
-  static boolean segmentsIntersectNotAtEndpoint(Point a, Point b, Point c, Point d) {
+  static boolean segmentsIntersectNotAtEndpoint(GeoPoint a, GeoPoint b, GeoPoint c, GeoPoint d) {
     if ((a == c && b == d) || (a == d && b == c)) return true; // intersection is the entire segment(s)
     if (a == b || a == c || a == d || b == c || b == d || c == d) return false; // the segments share a point
     return segmentsIntersect(a,b,c,d);
   }
 
-  static float slope     (Point a, Point b) { return (b.y - a.y) / (b.x - a.x); }
-  static float intercept (Point a, float m) { return a.y - m * a.x; }
+  static float slope     (GeoPoint a, GeoPoint b) { return (b.y - a.y) / (b.x - a.x); }
+  static float intercept (GeoPoint a, float m) { return a.y - m * a.x; }
 
   // Find the point where Line(a,b) intersects with Line(c,d)
   // Assumption: lines are not identical & no infinite slopes...
-  static Point lineIntersect(Point n, Point o, Point p, Point q) {
+  static GeoPoint lineIntersect(GeoPoint n, GeoPoint o, GeoPoint p, GeoPoint q) {
     float m1 = slope(n,o);
     float m2 = slope(p,q);
     float b1 = intercept(n, m1);
     float b2 = intercept(p, m2);
     float x = (b2 - b1) / (m1 - m2);
     float y = (m1*b2 - m2*b1) / (m1 - m2);
-    return new Point(x, y);
+    return new GeoPoint(x, y);
   }
 
-  Point copy() { return new Point(vp, x, y, radius); }
+  GeoPoint copy() { return new GeoPoint(vp, x, y, radius); }
 
   // Adjust our position by the given delta (relative coordinates):
   // return: whether or not we actually performed the move.
@@ -138,8 +138,8 @@ public class Point implements Comparable<Point> {
   void setConstraint(Polygon p) { this.constraint = p; }
 
   // Does (this --> b --> c) form a left turn?
-  boolean isLeftTurn(Point b, Point c)  { return Edge.cross(this, b, b, c) > 0; }
-  boolean isRightTurn(Point b, Point c) { return Edge.cross(this, b, b, c) < 0; }
+  boolean isLeftTurn(GeoPoint b, GeoPoint c)  { return Edge.cross(this, b, b, c) > 0; }
+  boolean isRightTurn(GeoPoint b, GeoPoint c) { return Edge.cross(this, b, b, c) < 0; }
   // TODO: enforce general position...
   
   public String getName() { return p.str(unique_name); }
@@ -149,23 +149,23 @@ public class Point implements Comparable<Point> {
   }
 
   // Compute the angle in radians on [pi, -pi] of this point using the given point as the origin:
-  public float polarTheta(Point origin)  { return p.atan2(y - origin.y, x - origin.x) + p.PI; }
-  public float polarRadius(Point origin) { return p.sqrt(p.pow(y - origin.y, 2) + p.pow(x - origin.x, 2)); }
+  public float polarTheta(GeoPoint origin)  { return p.atan2(y - origin.y, x - origin.x) + p.PI; }
+  public float polarRadius(GeoPoint origin) { return p.sqrt(p.pow(y - origin.y, 2) + p.pow(x - origin.x, 2)); }
 
 	@Override
-  public int compareTo(Point p2) { return Comparators.polarTheta.compare(this, p2); }
+  public int compareTo(GeoPoint p2) { return Comparators.polarTheta.compare(this, p2); }
 
   public static class Comparators {
-    public static Comparator<Point> getPolarTheta(Point pos) {
-      final Point origin = new Point(null, pos.x, pos.y);
-      return new Comparator<Point>() {
+    public static Comparator<GeoPoint> getPolarTheta(GeoPoint pos) {
+      final GeoPoint origin = new GeoPoint(null, pos.x, pos.y);
+      return new Comparator<GeoPoint>() {
         @Override
-        public int compare(Point p1, Point p2) {
+        public int compare(GeoPoint p1, GeoPoint p2) {
           return new Float(p1.polarTheta(origin)).compareTo(p2.polarTheta(origin));
         }
       }; 
     }
-    public static Comparator<Point> polarTheta = getPolarTheta(new Point(null,0,0));
+    public static Comparator<GeoPoint> polarTheta = getPolarTheta(new GeoPoint(null,0,0));
 	}
 
 }
