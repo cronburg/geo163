@@ -7,7 +7,8 @@ Text text   = new Text(vpText, space);
 
 void setup() {
   background(255);
-  size(1350,900);
+  //size(1350,900);
+  size(1300,860);
   surface.setResizable(true);
 
   PFont mono = createFont("fonts/UbuntuMono-B.ttf", 32);

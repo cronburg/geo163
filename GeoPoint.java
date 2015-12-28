@@ -4,8 +4,7 @@ import java.awt.Color;
 import java.util.*;
 
 public class GeoPoint implements Comparable<GeoPoint> {
-  float x;     // x-pos relative to viewport
-  float y;     // y-pos relative to viewport
+  Point pos;   // (x,y)-pos relative to viewport
   PApplet p;
   Viewport vp;  // The viewport this point belongs to (Viewport is larger)
   float radius; // radius of the point (absolute position value for now)
@@ -23,8 +22,7 @@ public class GeoPoint implements Comparable<GeoPoint> {
   private void _init(Viewport vp, float x, float y, float r) {
     this.vp = vp;
     if (null != vp) this.p = vp.p;
-    this.x = x;
-    this.y = y;
+    this.pos = new Point(x,y);
     this.radius = r;
     this.mouseContains = false;
     this.constraint = null;
@@ -45,6 +43,9 @@ public class GeoPoint implements Comparable<GeoPoint> {
     this.p = vp.p;
   }
 
+  public float x() { return pos.x; }
+  public float y() { return pos.y; }
+
   // Macro for auto-converting window coordinates to relative coordinates
   // when creating a new point:
   static GeoPoint newAbsGeoPoint(Viewport vp, int x, int y) {
@@ -53,7 +54,7 @@ public class GeoPoint implements Comparable<GeoPoint> {
 
   void draw(Color hovorColor) {
     mouseContains = false;
-    if (vp.circleContainsMouse(x, y, radius)) {
+    if (vp.circleContainsMouse(x(), y(), radius)) {
       p.fill(hovorColor.getRGB());
       if (hover) vp.hoverText(getName());
       mouseContains = true;
@@ -63,12 +64,12 @@ public class GeoPoint implements Comparable<GeoPoint> {
 
     }
     // TODO: circle color
-    vp.circle(x, y, radius);
+    vp.circle(x(), y(), radius);
     if (label) {
       p.textAlign(p.CENTER, p.CENTER);
       p.fill(255);
       p.textSize(10);
-      vp.text(getName(), x, y);
+      vp.text(getName(), x(), y());
     }
   }
 
@@ -78,21 +79,21 @@ public class GeoPoint implements Comparable<GeoPoint> {
   // Draw a line from this point to another point:
   void drawLineTo(GeoPoint b, Color c) {
     p.stroke(c.getRGB()); // TODO color
-    p.line( vp.toAbsX(this.x), vp.toAbsY(this.y)
-          , vp.toAbsX(b.x), vp.toAbsY(b.y));
+    p.line( vp.toAbsX(x()), vp.toAbsY(y())
+          , vp.toAbsX(b.x()), vp.toAbsY(b.y()));
   }
 
   // Distance from this point to another:
-  float distance(GeoPoint b) { return p.sqrt(p.pow(b.x - x, 2) + p.pow(b.y - y, 2)); }
+  float distance(GeoPoint b) { return p.sqrt(p.pow(b.x() - x(), 2) + p.pow(b.y() - y(), 2)); }
 
-  void setAbsX(float absX) { this.x = vp.toRelX(absX); }
-  void setAbsY(float absY) { this.y = vp.toRelY(absY); }
+  void setAbsX(float absX) { pos.x = vp.toRelX(absX); }
+  void setAbsY(float absY) { pos.y = vp.toRelY(absY); }
 
   // Whether or not line segments (a,b) and (c,d) intersect:
   static boolean segmentsIntersect(GeoPoint a, GeoPoint b, GeoPoint c, GeoPoint d) {
     // TODO: not library code
-    Line2D s1 = new Line2D.Float(a.x, a.y, b.x, b.y);
-    Line2D s2 = new Line2D.Float(c.x, c.y, d.x, d.y);
+    Line2D s1 = new Line2D.Float(a.x(), a.y(), b.x(), b.y());
+    Line2D s2 = new Line2D.Float(c.x(), c.y(), d.x(), d.y());
     return s2.intersectsLine(s1);
   }
 
@@ -104,8 +105,8 @@ public class GeoPoint implements Comparable<GeoPoint> {
     return segmentsIntersect(a,b,c,d);
   }
 
-  static float slope     (GeoPoint a, GeoPoint b) { return (b.y - a.y) / (b.x - a.x); }
-  static float intercept (GeoPoint a, float m) { return a.y - m * a.x; }
+  static float slope     (GeoPoint a, GeoPoint b) { return (b.y() - a.y()) / (b.x() - a.x()); }
+  static float intercept (GeoPoint a, float m) { return a.y() - m * a.x(); }
 
   // Find the point where Line(a,b) intersects with Line(c,d)
   // Assumption: lines are not identical & no infinite slopes...
@@ -119,19 +120,19 @@ public class GeoPoint implements Comparable<GeoPoint> {
     return new GeoPoint(x, y);
   }
 
-  GeoPoint copy() { return new GeoPoint(vp, x, y, radius); }
+  GeoPoint copy() { return new GeoPoint(vp, x(), y(), radius); }
 
   // Adjust our position by the given delta (relative coordinates):
   // return: whether or not we actually performed the move.
   boolean moveDelta(float dx, float dy) {
-    float newX = x + dx;
-    float newY = y + dy;
+    float newX = x() + dx;
+    float newY = y() + dy;
     if (null != this.constraint && !constraint.contains(newX, newY)) {
       return false;
     }
-    p.print("x = " + p.str(x) + ", y = " + p.str(y) + "\n");
-    this.x = newX;
-    this.y = newY;
+    p.print("x = " + p.str(x()) + ", y = " + p.str(y()) + "\n");
+    pos.x = newX;
+    pos.y = newY;
     return true;
   }
 
@@ -145,19 +146,19 @@ public class GeoPoint implements Comparable<GeoPoint> {
   public String getName() { return p.str(unique_name); }
 
   public String toString() {
-    return "(" + p.str(x) + "," + p.str(y) + ")";
+    return "(" + p.str(x()) + "," + p.str(y()) + ")";
   }
 
   // Compute the angle in radians on [pi, -pi] of this point using the given point as the origin:
-  public float polarTheta(GeoPoint origin)  { return p.atan2(y - origin.y, x - origin.x) + p.PI; }
-  public float polarRadius(GeoPoint origin) { return p.sqrt(p.pow(y - origin.y, 2) + p.pow(x - origin.x, 2)); }
+  public float polarTheta(GeoPoint origin)  { return p.atan2(y() - origin.y(), x() - origin.x()) + p.PI; }
+  public float polarRadius(GeoPoint origin) { return p.sqrt(p.pow(y() - origin.y(), 2) + p.pow(x() - origin.x(), 2)); }
 
 	@Override
   public int compareTo(GeoPoint p2) { return Comparators.polarTheta.compare(this, p2); }
 
   public static class Comparators {
     public static Comparator<GeoPoint> getPolarTheta(GeoPoint pos) {
-      final GeoPoint origin = new GeoPoint(null, pos.x, pos.y);
+      final GeoPoint origin = new GeoPoint(null, pos.x(), pos.y());
       return new Comparator<GeoPoint>() {
         @Override
         public int compare(GeoPoint p1, GeoPoint p2) {

@@ -6,7 +6,7 @@ public class Viewport {
   PApplet p;
   private float _x, _y, _w, _h;
   private float zoom; // negative == zoomed out, positive == zoomed in
-  private float zoomOffset; // offset of zoom location from (0,0) of this viewport
+  private Point zoomPos; // offset of zoom location from (0,0) of this viewport
 
   private void _init(Viewport parent, float _x, float _y, float _w, float _h, float zoom) {
     this._x = parent.getrelX() + _x*parent.getrelW();
@@ -14,6 +14,7 @@ public class Viewport {
     this._w = _w * parent.getrelW();
     this._h = _h * parent.getrelH();
     this.zoom = zoom;
+    this.zoomPos = new Point((float)0.5, (float)0.5); // only zoom around the center of the Viewport for now
     this.p = parent.p;
   }
   
@@ -45,11 +46,6 @@ public class Viewport {
   // Instance variables _x, _y, _w, and _h should NOT be used below this line!
   // --------------------------------------------------------------------------
   
-  void changeZoom(boolean zoomIn) {
-    zoom += (zoomIn ? -1 : 1);
-  }
-
-
   // TODO: setters?
 
   void drawBorder() {
@@ -122,12 +118,28 @@ public class Viewport {
   float toRelY(float val) { return (val - y()) / h(); }
   
   // Converting relative to absolute is affected by the current zoom level:
+  //float toAbsX(float val) { return x() + toAbsXLen(val) + toAbsXLen(zoomDeltaX(val)); }
+  //float toAbsY(float val) { return y() + toAbsYLen(val) + toAbsYLen(zoomDeltaY(val)); }
   float toAbsX(float val) { return x() + toAbsXLen(val); }
   float toAbsY(float val) { return y() + toAbsYLen(val); }
 
   // Calculate an absolute length given a relative value val:
   float toAbsXLen(float val) { return val * w(); }
   float toAbsYLen(float val) { return val * h(); }
+
+  // TODO: magic scaling factor...
+  float zoomDeltaX(float val) {
+    float dist = val - zoomPos.x;
+    return (float)(0 - 0.05 * zoom * dist);
+  }
+  float zoomDeltaY(float val) {
+    float dist = val - zoomPos.y;
+    return (float)(0 - 0.05 * zoom * dist);
+  }
+  
+  void changeZoom(boolean zoomIn) {
+    zoom += (zoomIn ? -1 : 1);
+  }
 
 }
 

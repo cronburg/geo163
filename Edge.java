@@ -20,14 +20,14 @@ class Edge {
 
   // Magnitude of the line segment (edge) between two points:
   static float mag(GeoPoint a, GeoPoint b) {
-    float dx = b.x - a.x;
-    float dy = b.y - a.y;
+    float dx = b.x() - a.x();
+    float dy = b.y() - a.y();
     return PApplet.sqrt(dx*dx + dy*dy);
   }
 
   // Compute scalar cross product of line segments (ab) x (cd)
   static float cross(GeoPoint a, GeoPoint b, GeoPoint c, GeoPoint d) {
-    return (b.x - a.x) * (d.y - c.y) - (b.y - a.y) * (d.x - c.x);
+    return (b.x() - a.x()) * (d.y() - c.y()) - (b.y() - a.y()) * (d.x() - c.x());
   }
 
   // Compute cross product of this edge with another edge:

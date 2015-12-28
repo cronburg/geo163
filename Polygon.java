@@ -128,14 +128,14 @@ public class Polygon {
   GeoPoint getMaxX() {
     GeoPoint m = points.get(0); // TODO empty polygon
     for (int i = 1; i < points.size(); i++) {
-      if (m.x < points.get(i).x) m = points.get(i);
+      if (m.x() < points.get(i).x()) m = points.get(i);
     }
     return m;
   }
   GeoPoint getMaxY() {
     GeoPoint m = points.get(0);
     for (int i = 1; i < points.size(); i++) {
-      if (m.y < points.get(i).y) m = points.get(i);
+      if (m.y() < points.get(i).y()) m = points.get(i);
     }
     return m;
   }
@@ -148,7 +148,7 @@ public class Polygon {
     }
 
     // Ad-hoc point "at infinity" (necessarily outside of convex hull):
-    GeoPoint inf = new GeoPoint(vp, getMaxX().x * 2, getMaxY().y * 2);
+    GeoPoint inf = new GeoPoint(vp, getMaxX().x() * 2, getMaxY().y() * 2);
     //p.drawLineTo(inf); // Draw infinite ray for debugging
 
     int count = 0;
@@ -175,7 +175,7 @@ public class Polygon {
     while (!stack.empty()) {
       curr = (Edge)stack.pop();
       p.print("  " + curr.toString() + "\n");
-      add(curr.a.x, curr.a.y);
+      add(curr.a.x(), curr.a.y());
     }
     closed = true;
     lineColor = Color.GREEN;
