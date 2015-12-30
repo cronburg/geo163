@@ -1,0 +1,26 @@
+\section{Future} \label{sec:future}
+
+The core limitation to updating a visibility polygon of $O(v)$ size in
+$O(1)$ time is that to actually observe the solution necessarily
+requires $O(w)$ time to compute the window point intersections where
+in the worst case $w \in O(v)$. Certainly then if the solution is
+required frequently relative to the distance the visibility travels,
+any dynamic visibility algorithm degenerates to a best possible case
+$O(w)$ runtime.
+
+\subsection{Practical Improvements} \label{sec:improvements}
+
+\subsection{Example Use Case} \label{sec:use-cases}
+
+We have implemented (in a github repository - see~\cite{visibility-github})
+a simple app allowing a user to control the motion of a point through a
+polygon.
+
+As the basis for an \emph{art-gallery-guard} game, this app would
+require low-latency in recomputing the visibility polygon as a guard
+moves around the polygon. Our \emph{UpdateVisibility} algorithm becomes
+even more applicable when the game becomes multiplayer and the app needs
+to compute a visibility polygon for each player.
+As the basis for a multi-particle simulation the same logic applies -
+we trade off memory usage in favor of constant-time low latency solutions.
+

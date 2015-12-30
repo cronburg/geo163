@@ -1,0 +1,169 @@
+%-----------------------------------------------------------------------------
+%
+%               Template for sigplanconf LaTeX Class
+%
+% Name:         sigplanconf-template.tex
+%
+% Purpose:      A template for sigplanconf.cls, which is a LaTeX 2e class
+%               file for SIGPLAN conference proceedings.
+%
+% Guide:        Refer to "Author's Guide to the ACM SIGPLAN Class,"
+%               sigplanconf-guide.pdf
+%
+% Author:       Paul C. Anagnostopoulos
+%               Windfall Software
+%               978 371-2316
+%               paul@windfall.com
+%
+% Created:      15 February 2005
+%
+%-----------------------------------------------------------------------------
+
+
+\documentclass[10pt,preprint]{sigplanconf}
+
+% The following \documentclass options may be useful:
+
+% preprint      Remove this option only once the paper is in final form.
+% 10pt          To set in 10-point type instead of 9-point.
+% 11pt          To set in 11-point type instead of 9-point.
+% authoryear    To obtain author/year citation style instead of numeric.
+
+\usepackage{fancyvrb}
+\usepackage{amsmath}
+\usepackage{minted}
+\usepackage{hyperref}
+
+% pstricks?:
+\usepackage{graphicx}
+\usepackage{mathtools}
+\usepackage[pdf]{pstricks}
+\usepackage{array}
+\usepackage{amsmath, amssymb, graphics, setspace}
+\newcommand{\mathsym}[1]{{}}
+\newcommand{\unicode}[1]{{}}
+
+% \cc{my_c_code}
+\newmintinline[cc]{c}{fontsize=\small}
+\newmintinline[java]{java}{fontsize=\small}
+\newmintinline[py]{python}{fontsize=\small}
+
+\begin{document}
+
+\special{papersize=8.5in,11in}
+\setlength{\pdfpageheight}{\paperheight}
+\setlength{\pdfpagewidth}{\paperwidth}
+
+% Re-add if accepted:
+\conferenceinfo{CONF 'yy}{Month d--d, 20yy, City, ST, Country} 
+\copyrightyear{20yy} 
+\copyrightdata{978-1-nnnn-nnnn-n/yy/mm} 
+\doi{nnnnnnn.nnnnnnn}
+
+% Uncomment one of the following two, if you are not going for the 
+% traditional copyright transfer agreement.
+
+%\exclusivelicense                % ACM gets exclusive license to publish, 
+                                  % you retain copyright
+
+%\permissiontopublish             % ACM gets nonexclusive license to publish
+                                  % (paid open-access papers, 
+                                  % short abstracts)
+
+%\titlebanner{banner above paper title}        % These are ignored unless
+%\preprintfooter{short description of paper}   % 'preprint' option specified.
+
+\title{Dynamic Visibility of a Point in a Polygon}
+%\subtitle{Subtitle Text, if any}
+
+% For empty space pre-submission:
+%\authorinfo{\vspace{-50ex}}{\vspace{-50ex}}{\vspace{-50ex}}
+
+\authorinfo{Karl Cronburg}
+           {Tufts University}
+           {karl@cs.tufts.edu}
+%\authorinfo{Samuel Z. Guyer}
+%           {Tufts University}
+%           {sguyer@cs.tufts.edu}
+
+%\authorinfo{Name2\and Name3}
+%           {Affiliation2/3}
+%           {Email2/3}
+
+\maketitle
+
+\begin{abstract}
+In this work we present a time-optimal algorithm for maintaining
+the visibility polygon of a point in a polygon in the presence of
+small point movements.
+The work of \cite{dynamic-visibility} maintains a space complexity
+of $O(n)$ ($n$ input polygon vertices) and describes their data
+structures in the dual. In contrast we spare no expense with space,
+and instead look at what inherent time complexity limitations arise
+from the dynamic visibility problem.
+\end{abstract}
+
+% Re-add if accepted:
+%\category{CR-number}{subcategory}{third-level}
+
+% general terms are not compulsory anymore, 
+% you may leave them out
+%\terms
+%term1, term2
+
+\keywords
+Visibility, polygon, geometry
+
+%\section{Introduction}
+
+\input{intro.tex}
+
+\input{algo.tex}
+
+\input{future.tex}
+
+%\appendix
+
+%\acks
+%Acknowledgments, if needed.
+
+% We recommend abbrvnat bibliography style.
+\bibliographystyle{abbrvnat}
+
+% The bibliography should be embedded for final submission.
+
+\begin{thebibliography}{}
+\softraggedright
+
+%\bibitem[Smith et~al.(2009)Smith, Jones]{smith02}
+%P. Q. Smith, and X. Y. Jones. ...reference text...
+
+% bibtex:
+%@MISC{Rivière97dynamicvisibility,
+%    author = {Stephane Rivière},
+%    title = {Dynamic Visibility in Polygonal Scenes With the Visibility Complex},
+%    year = {1997}
+%}
+
+\bibitem[Rivière (1997)]{dynamic-visibility}
+Stepahne Rivière.
+Dynamic Visibility in Polygonal Scenes With the Visibility Complex.
+In \emph{SCG Proceedings of the thirteenth annual symposium on Computational geometry}.
+
+\bibitem[Cronburg (2015)]{visibility-github}
+Karl Cronburg
+Visibility polygon implementation:
+\href{https://github.com/cronburg/geo163}{https://github.com/cronburg/geo163}
+
+\end{thebibliography}
+
+
+\end{document}
+
+%                       Revision History
+%                       -------- -------
+%  Date         Person  Ver.    Change
+%  ----         ------  ----    ------
+
+%  2013.06.29   TU      0.1--4  comments on permission/copyright notices
+

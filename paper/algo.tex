@@ -1,0 +1,180 @@
+\section{Algorithm \& Data Structures} \label{sec:algorithm}
+
+The goal of this algorithm is to have average case constant time
+visibility polygon updates in the presence of a moving visibility point. This
+\py{UpdateVisibility} pseudocode gives a top-level view of what the
+algorithm does:
+
+\begin{minted}{python}
+def UpdateVisibility(point): # O(1)
+  move = Edge(point, point.nextPosition):
+  # O(1) neighbors
+  for neighbor in point.currDelaunay.neighbors:
+    if Intersect(move, neighbor):
+      return neighbor
+  return point.currDelaunay
+\end{minted}
+
+This assumes we have a graph of Delaunay triangles, each of which have
+associated with them $O(1)$ instructions for how to compute each of the
+windows in their visibility polygon given the location of a point inside
+the DT.
+
+\subsection{UpdateVisibility Details}
+
+In \py{UpdateVisibility} we are finding the Delaunay triangle (DT) that our
+point is transitioning into by checking which neighboring DT
+intersects with the point's segment of movement.
+
+When the point moves from one DT to another we have one of two cases:
+
+\begin{enumerate}
+  \item The new DT is inside the same convex \emph{visibility region}
+    (see Figure~\ref{fig:visibility-regions}). In this
+    case we need only recompute where the window points lay on the same
+    edge they were on before. This can be done in $O(w)$ for $w$ window
+    edges in the visibility region, which is necessarily $O(w) \in O(v)$
+    for $v$ visibility polygon vertices. This is optimal because we must
+    at least read off the $v$ vertices in the visibility solution. If on
+    the other hand we did not need the visibility polygon for a particular
+    time step, the runtime is $O(1)$ to move the point in our Delaunay
+    graph.
+  \item The new DT crosses a convex visibility region edge into a new
+    region. Given general position, this transition requires the
+    updating of exactly one edge / window in the visibility polygon
+    which can be done online in $O(1)$. Again as in case $1$, we also
+    recalculate where the windows land on their respective polygon
+    edges in $O(w)$ time.
+\end{enumerate}
+
+\begin{figure}
+  \begin{center}
+    \input{figures/window-edge-merge.tex}
+  \end{center}
+  \caption{\label{fig:window-edge-merge}
+    The visibility window (dashed line) passing through polygon vertex
+    $a$ merges with the line segment $\overline{ab}$; i.e. the segment
+    $\overline{ab}$ goes from being invisible to visible. Because of our
+    general position and small motion assumptions, no two windows can
+    change at the same time.
+  }
+\end{figure}
+
+\begin{figure}
+  \begin{center}
+    \input{figures/window-vertex-pass.tex}
+  \end{center}
+  \caption{\label{fig:window-vertex-pass}
+    The window in this figure is initially passing through $a$ and
+    landing on the polygonal edge $\overline{bc}$. When we then move
+    the point a short distance to the left, the window passes through
+    point $c$ now landing on edge $\overline{de}$.
+  }
+\end{figure}
+  
+\begin{figure}
+  \begin{center}
+    \input{figures/edge-change.tex}
+  \end{center}
+  \caption{\label{fig:edge-change}
+    Example point movement where a window is created when edge
+    $\overline{ag}$ goes invisible.
+  }
+\end{figure}
+
+\subsection{Delaunay Justification} \label{sec:delaunay-justification}
+
+We use DTs to ensure that we look at a constant number of edges
+(neighboring DTs) for each visibility update. If we had
+used the entire convex partitions of our polygon, we would be stuck
+with an $O(\log n)$ average case as required by the visibility
+complex of \cite{dynamic-visibility}. In the Section~\ref{sec:future}
+we discuss possible theories for improving the time bound to be
+$\theta(1)$ in all cases.
+
+In order to get the DTs and build a meaningful graph of visibility
+polygons from them, we have to first partition our polygon into
+convex \emph{visibility regions} (Figure~\ref{fig:visibility-regions}).
+Top-level code for this looks like:
+
+\begin{minted}{python}
+def PrecomputeVisibility(polygon):
+  delaunays = []
+  visGraph  = VisibilityPartition(polygon)
+  for convexPoly in visGraph:
+    delaunays.append(DelaunayTriang(convexPoly))
+  ds = LinkNeighbors(delaunays)
+  ComputeVisibilities(polygon, ds)
+  return ds
+\end{minted}
+
+\emph{VisibilityPartition} computes a list of convex polygons like the
+ones shown in Figure~\ref{fig:visibility-regions}. These visibility
+regions are then further partitioned into their Delaunay Triangulations
+in the \emph{DelaunayTriang} method. Next we link neighboring
+DTs in \emph{LinkNeighbors} forming a Delaunay graph. Finally
+\emph{ComputeVisibilities} informs each of the nodes (DTs) in the
+Delaunay graph how to compute the visibility polygon of a point inside
+of it:
+
+\begin{minted}{python}
+def ComputeVisibilities(polygon, ds):
+  for d in ds:
+    ws = ComputeWindows(polygon, d)
+    vs = VisibleEdges(polygon, d)
+    d.visEdges = RadialSort(d, ws, vs)
+    def GetVisPoly(position, d=d):
+      visPoly = []
+      for e in d.visEdges:
+        if isWindow(e):
+          AddWindow(visPoly, point, e)
+        else: visPoly.append(e)
+      return visPoly
+    d.getVisPoly = GetVisPoly
+\end{minted}
+
+\emph{ComputeVisibilities} takes each DT in the DT-partitioning of
+the polygon. For a DT, we precompute all the polygonal edges which
+will be involved in a window as well as any edges fully visible from
+inside the DT. We then radially sort these windows \& edges so that
+when \emph{GetVisPoly} iterates over them the DTs will already be in
+the correct order to form the visibility polygon (\emph{visPoly})
+computed online. We then define the code \emph{GetVisPoly} for computing
+a visibility polygon in $O(v)$ time ($v$ vertices in the visibility
+polygon). Note that \emph{GetVisPoly} does not run until a point
+requests its visibility polygon at runtime by calling
+\py{point.currDelaunay.getVisPoly(point)} e.g. immediately after
+\emph{UpdateVisibility} runs.
+
+As just stated \emph{GetVisPoly} runs in $O(v)$ time, but the
+actual visibility update (\emph{UpdateVisibility}) to know which
+DT we are in took constant average time.
+
+\begin{figure}
+  \begin{center}
+    \input{figures/visibility-regions.tex}
+  \end{center}
+  \caption{\label{fig:visibility-regions}
+    Example decomposition of a polygon into convex
+    \emph{visibility regions}. Highlighted (in green) is one such
+    region. Transitioning from one region to another neighboring
+    region changes at most the visibility of one edge or which edge
+    a window lands on.
+  }
+\end{figure}
+
+\begin{figure}
+  \begin{center}
+    \input{figures/delaunay-triangles.tex}
+  \end{center}
+  \caption{\label{fig:delaunay-triangles}
+    Further decomposition of the visibility regions of
+    Figure~\ref{fig:visibility-regions} into their respective
+    Delaunay Triangulations. One such DT is highlighted in red
+    which has two neighboring DTs. Note that a point movement from
+    the red to yellow DT is possible, but this can be handled in
+    constant time as two transitions using the purple DT as an
+    intermediary.
+  }
+\end{figure}
+

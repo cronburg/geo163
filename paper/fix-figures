@@ -1,0 +1,8 @@
+#!/bin/bash
+XUNIT="1.0"
+YUNIT="1.0"
+for f in figures/*.tex; do
+  sed -i.bak "s/xunit=\.5pt/xunit="$XUNIT"pt/" $f
+  sed -i.bak "s/yunit=\.5pt/yunit="$YUNIT"pt/" $f
+done
+
