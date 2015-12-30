@@ -6,7 +6,7 @@ Comp 163 project @ Tufts.
 For most recent compiled version of the dynamic visibility polygon
 computation description, see:
 
-    https://www.eecs.tufts.edu/~karl/geo/dynamic-visibility.pdf
+[Dynamic Visibility description](https://www.eecs.tufts.edu/~karl/geo/dynamic-visibility.pdf)
 
 Or it can be compiled by running *make* in the *paper* directory.
 
