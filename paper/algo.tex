@@ -6,9 +6,9 @@ visibility polygon updates in the presence of a moving visibility point. This
 algorithm does:
 
 \begin{minted}{python}
-def UpdateVisibility(point): # O(1)
+def UpdateVisibility(point): # O(1) on average
   move = Edge(point, point.nextPosition):
-  # O(1) neighbors
+  # O(1) neighbors on average
   for neighbor in point.currDelaunay.neighbors:
     if Intersect(move, neighbor):
       return neighbor
@@ -97,6 +97,7 @@ polygons from them, we have to first partition our polygon into
 convex \emph{visibility regions} (Figure~\ref{fig:visibility-regions}).
 Top-level code for this looks like:
 
+\begin{samepage}
 \begin{minted}{python}
 def PrecomputeVisibility(polygon):
   delaunays = []
@@ -107,6 +108,7 @@ def PrecomputeVisibility(polygon):
   ComputeVisibilities(polygon, ds)
   return ds
 \end{minted}
+\end{samepage}
 
 \emph{VisibilityPartition} computes a list of convex polygons like the
 ones shown in Figure~\ref{fig:visibility-regions}. These visibility

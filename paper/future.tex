@@ -5,10 +5,30 @@ $O(1)$ time is that to actually observe the solution necessarily
 requires $O(w)$ time to compute the window point intersections where
 in the worst case $w \in O(v)$. Certainly then if the solution is
 required frequently relative to the distance the visibility travels,
-any dynamic visibility algorithm degenerates to a best possible case
-$O(w)$ runtime.
+any dynamic visibility algorithm has a tight lower bound of
+$\Omega(w)$.
 
 \subsection{Practical Improvements} \label{sec:improvements}
+
+Possibilities for making the \emph{UpdateVisibility} algorithm $\theta(1)$:
+\begin{itemize}
+\item Find the $k$ highest degree vertices in our precomputed Delaunay
+graph. Since we do not actually care about the Delaunay properties, we
+could find a way to retriangulate the high degree vertices.
+\item Come up with a triangulation which enforces a constant number of
+neighbors of triangulation vertices. This has the downside of possibly
+creating `long and skinny' triangles which the particle can easily
+jump through if the velocity does not have a low enough upper bound.
+\item Rely on online techniques to optimize visibility transitions
+commonly taken at the cost of space. In the worst case though this
+begins to require at least $\Omega(n!)$ space to remember
+all possible transitions.
+\end{itemize}
+
+The \emph{GetVisPoly} algorithm presented here runs in $O(v)$ time for
+$v$ output vertices in the visibility polygon. In practice the completely
+visible edge remain unmodified so a more sophisticated algorithm could
+run in $O(w)$ for $w$ window vertices in the output visibility polygon.
 
 \subsection{Example Use Case} \label{sec:use-cases}
 

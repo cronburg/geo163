@@ -3,19 +3,21 @@
 Given effectively unlimited precomputation time, and space we show
 that the visibility of a point inside a simple polygon reduces to
 (at runtime) the problem of detecting segment intersection with a
-much smaller convex polygon.
+much smaller convex polygon. These convex polygons can be further
+triangulated to 
 
-The results of this work are directly applicable to the implementation
-of games and simulations involving the continuous motion of a point
+Our algorithm is directly applicable to the implementation
+of games and simulations involving the continuous motion of points
 through a closed and finite partition of a $2$-dimensional space.
 For example one might have a particle simulation involving at least
 $p \in \Omega(n^2)$ particles ($n$ polygon vertices). In this situation,
 the naiive worst case space complexity requires computing $O(n^2)$
-(mostly) distinct visibility polygons.
+distinct visibility polygons each in $O(n)$ time without any
+precomputation or memoization optimizations.
 
 Furthermore, many dynamic visibility applications realistically have
 the self-imposed limitation of small point velocities. Relatively
-low velocities lends itself to amortizing the cost of computing the
+low velocities lends itself to lowering the cost of computing the
 next segment intersection to cause a \emph{change} in the visibility
 polygon. By \emph{change} we mean:
 
@@ -30,7 +32,7 @@ visibile or invisible (Figure~\ref{fig:edge-change}).
 
 All of these cases are defined by our point crossing over an infinite ray
 extending from an edge on a reflex vertex, pointing into the polygon
-(Figure \ref{fig:reflex-half-planes}). As we know from the algorithm
+(dashed lines in Figure \ref{fig:visibility-regions}). As we know from the algorithm
 for computing the kernel of a polygon, these rays intersect with each
 other to form a partitioning of the closed space inside our polygon
 into convex subpolygons. In the \emph{Algorithm} section we discuss how
