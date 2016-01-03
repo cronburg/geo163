@@ -1,9 +1,8 @@
-import processing.core.*;
-import java.awt.Color;
-import java.util.Vector;
+//import processing.core.*;
+//import java.awt.Color;
+//import java.util.Vector;
 
 public class Viewport {
-  PApplet p;
   private float _x, _y, _w, _h;
   private float zoom; // negative == zoomed out, positive == zoomed in
   private Point zoomPos; // offset of zoom location from (0,0) of this viewport
@@ -15,7 +14,6 @@ public class Viewport {
     this._h = _h * parent.getrelH();
     this.zoom = zoom;
     this.zoomPos = new Point((float)0.5, (float)0.5); // only zoom around the center of the Viewport for now
-    this.p = parent.p;
   }
   
   Viewport(Viewport parent, float _x, float _y, float _w, float _h) { _init(parent,_x,_y,_w,_h,(float)0.0); }
@@ -28,7 +26,6 @@ public class Viewport {
     this._w = (float)1.0;
     this._h = (float)1.0;
     this.zoom = (float)0.0;
-    this.p = parent;
   }
 
   // rel == relative == fraction from 0 to 1 of viewport width / height:
@@ -38,10 +35,10 @@ public class Viewport {
   private float getrelH() {return _h;}
 
   // Get coordinates based on current screen width / height
-  public float x() {return p.width  * _x;}
-  public float y() {return p.height * _y;}
-  public float w() {return p.width  * _w;}
-  public float h() {return p.height * _h;}
+  public float x() {return width  * _x;}
+  public float y() {return height * _y;}
+  public float w() {return width  * _w;}
+  public float h() {return height * _h;}
   
   // Instance variables _x, _y, _w, and _h should NOT be used below this line!
   // --------------------------------------------------------------------------
@@ -49,20 +46,20 @@ public class Viewport {
   // TODO: setters?
 
   void drawBorder() {
-    p.stroke(0x00);
-    p.fill(0xffffff);
-    p.rect(x(), y(), w(), h());
+    stroke(0x00);
+    fill(0xffffff);
+    rect(x(), y(), w(), h());
   }
 
   // Draw given text as hover-text over the current mouse location:
   void hoverText(String txt) {
-    p.fill(0);
-    p.textSize(12);
-    p.textAlign(p.LEFT, p.BOTTOM);
-    p.text(txt, p.mouseX + 10, p.mouseY + 10); // TODO
+    fill(0);
+    textSize(12);
+    textAlign(LEFT, BOTTOM);
+    text(txt, mouseX + 10, mouseY + 10); // TODO
   }
 
-  void text(String txt, float xPos, float yPos) { p.text(txt, (int)toAbsX(xPos), (int)toAbsY(yPos)); }
+  void vpText(String txt, float xPos, float yPos) { text(txt, (int)toAbsX(xPos), (int)toAbsY(yPos)); }
 
   float centerX() { return x() + (float)(w() / 2.0); }
   float centerY() { return y() + (float)(h() / 2.0); }
@@ -81,7 +78,7 @@ public class Viewport {
   }
 
   boolean containsMouse() {
-    return contains(toRelX(p.mouseX), toRelY(p.mouseY));
+    return contains(toRelX(mouseX), toRelY(mouseY));
   }
 
   boolean circleContains(float queryX, float queryY, float posX, float posY, float radius) {
@@ -92,25 +89,29 @@ public class Viewport {
   
   // posX and poxY are in coordinates relative to this Viewport.
   boolean circleContainsMouse(float posX, float posY, float radius) {
-    return circleContains(toRelX(p.mouseX), toRelY(p.mouseY), posX, posY, radius);
+    return circleContains(toRelX(mouseX), toRelY(mouseY), posX, posY, radius);
   }
 
   // Draw an ellipse given relative coordinates as input.
-  void ellipse(float posX, float posY, float e1, float e2) {
-    this.p.ellipse(toAbsX(posX), toAbsY(posY), toAbsXLen(e1), toAbsYLen(e2));
+  void vpEllipse(float posX, float posY, float e1, float e2) {
+    ellipse(toAbsX(posX), toAbsY(posY), toAbsXLen(e1), toAbsYLen(e2));
   }
+
+  void vpFill(color c) { fill(red(c), green(c), blue(c), alpha(c)); }
 
   void circle(float posX, float posY, float r) {
     // TODO: don't just assume r is relative to x-width
-    this.p.ellipse(toAbsX(posX), toAbsY(posY), toAbsXLen(r), toAbsXLen(r));
+    //println(str(toAbsX(posX)) + ", " + str(toAbsY(posY)) + ", " + str(toAbsXLen(r)) + ", " + str(toAbsXLen(r)));
+    fill(80, 80, 80);
+    ellipse(toAbsX(posX), toAbsY(posY), toAbsXLen(r), toAbsXLen(r));
   }
 
-  // Not to be confused with p.fill() - fill a rectangle corresponding to
+  // Not to be confused with fill() - fill a rectangle corresponding to
   // this Viewport with the given color.
-  void fillMe(Color c) {
-    p.stroke(0x00);
-    p.fill(c.getRGB());
-    p.rect(x(), y(), w(), h());
+  void fillMe(color c) {
+    stroke(0x00);
+    fill(c);
+    rect(x(), y(), w(), h());
   }
 
   // Absolute window position to relative conversion (relative to the current viewport)

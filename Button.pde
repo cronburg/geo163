@@ -1,18 +1,16 @@
-import processing.core.*;
-import java.awt.Color;
+//import processing.core.*;
+//import java.awt.Color;
 
 public class Button {
   
   Viewport vp;
-  PApplet p;
   String txt;      // Button label
   boolean pressed; // Whether or not this button is currently pressed.
-  Color bkgColor;
-  Color pressedColor;
+  color bkgColor;
+  color pressedColor;
 
   private void _init(Viewport vp, String txt, boolean pressed) {
     this.vp = vp;
-    this.p = vp.p;
     this.txt = txt;
     this.pressed = pressed;
     this.bkgColor = Palette.get(0);
@@ -30,11 +28,11 @@ public class Button {
       vp.fillMe(bkgColor);
     }
     
-    p.textSize(40);
-    p.fill(0);
+    textSize(40);
+    fill(0);
     
-    p.textAlign(p.CENTER, p.CENTER);
-    p.text(txt, vp.centerX(), vp.centerY());
+    textAlign(CENTER, CENTER);
+    text(txt, vp.centerX(), vp.centerY());
   
   }
 

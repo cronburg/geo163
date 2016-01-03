@@ -1,25 +1,23 @@
-import processing.core.*;
-import java.util.ArrayList;
-import java.awt.Color;
-import java.util.Collections;
-import java.util.Stack;
+//import processing.core.*;
+//import java.util.ArrayList;
+//import java.awt.Color;
+//import java.util.Collections;
+//import java.util.Stack;
 
 public class Polygon {
  
   Viewport vp;
-  PApplet p;
   ArrayList<GeoPoint> points;
   GeoPoint lastGeoPoint;
   GeoPoint firstGeoPoint;
   boolean badTentative; // Whether or not tentative new line is bad (non-simple polygon)
   boolean closed; // Whether or not to connect first and last point in the polygon
 
-  Color lineColor;
-  Color intersectColor;
+  color lineColor;
+  color intersectColor;
 
   private void _init(Viewport vp) {
     this.vp = vp;
-    this.p = vp.p;
     this.points = new ArrayList<GeoPoint>();
     this.lastGeoPoint = null;
     this.closed = false;
@@ -47,7 +45,7 @@ public class Polygon {
   void add(float x, float y) { add(new GeoPoint(vp, x, y)); }
 
   // Draw the given point, updating badTentative if necessary:
-  private void drawInternalGeoPoint(GeoPoint a, Color hovorColor) {
+  private void drawInternalGeoPoint(GeoPoint a, color hovorColor) {
     a.draw(hovorColor);
     if (a.mouseContains) {
       badTentative = true;
@@ -55,7 +53,7 @@ public class Polygon {
   }
 
   // Draw a point in the polygon and the line to the next point
-  private void drawGeoPointAndLineToNext(GeoPoint a, GeoPoint b, Color hovorColor) {
+  private void drawGeoPointAndLineToNext(GeoPoint a, GeoPoint b, color hovorColor) {
     a.drawLineTo(b, lineColor);
     drawInternalGeoPoint(a, hovorColor);
   }
@@ -63,11 +61,11 @@ public class Polygon {
   // Update badTentative and stroke color based on whether or not new line segment is feasible:
   private void checkLineSegment(boolean cndn, GeoPoint a, GeoPoint b, GeoPoint tentative, GeoPoint last) {
     // !closed because only make RED if not closed
-    if (!closed && cndn && GeoPoint.segmentsIntersect(a, b, tentative, last)) {
-      p.stroke(intersectColor.getRGB());
+    if (!closed && cndn && a.segmentsIntersect(b, tentative, last)) {
+      stroke(intersectColor);
       badTentative = true;
     } else {
-      p.stroke(lineColor.getRGB());
+      stroke(lineColor);
     }
   }
 
@@ -101,10 +99,10 @@ public class Polygon {
       //if (i < points.size() - 2) {
       checkLineSegment(i < points.size() - 2, a, b, tentativeGeoPoint, lastGeoPoint);
       //} else {
-      //  p.stroke(lineColor.getRGB());
+      //  stroke(lineColor.getRGB());
       //}
       
-      p.strokeWeight(2);
+      strokeWeight(2);
       drawGeoPointAndLineToNext(a, b, Palette.RED);
     }
 
@@ -112,7 +110,7 @@ public class Polygon {
     // and possibly the closing edge:
     GeoPoint last = points.get(points.size() - 1);
     if (closed) {
-      p.stroke(lineColor.getRGB());
+      stroke(lineColor);
       last.drawLineTo(points.get(0), lineColor);
     }
     // Draw first and last point last so no line overlap:
@@ -143,20 +141,20 @@ public class Polygon {
   // Does this polygon contain the given point?
   boolean contains(GeoPoint p) {
     if (!closed) {
-      this.p.print("WARNING: Testing if a non-closed polygon contains a point...\n");
+      print("WARNING: Testing if a non-closed polygon contains a point...\n");
       return false;
     }
 
     // Ad-hoc point "at infinity" (necessarily outside of convex hull):
     GeoPoint inf = new GeoPoint(vp, getMaxX().x() * 2, getMaxY().y() * 2);
-    //p.drawLineTo(inf); // Draw infinite ray for debugging
+    //drawLineTo(inf); // Draw infinite ray for debugging
 
     int count = 0;
     for (int i = 0; i < points.size(); i++) {
-      count += GeoPoint.segmentsIntersect(getGeoPoint(i), getGeoPoint(i+1), p, inf) ? 1 : 0;
+      count += getGeoPoint(i).segmentsIntersect(getGeoPoint(i+1), p, inf) ? 1 : 0;
     }
     //count += GeoPoint.segmentsIntersect(points.get(points.size() - 1), points.get(0), p, inf) ? 1 : 0;
-    //this.p.print("count = " + this.p.str(count) + "\n");
+    //print("count = " + str(count) + "\n");
 
     return (count % 2) == 1; // Odd number of crossings == inside (JCT)
   }
@@ -170,15 +168,15 @@ public class Polygon {
   // Convert the given visibility stack into a polygon:
   Polygon(Viewport vp, Stack<Edge> stack) {
     _init(vp);
-    p.print("ENDING STACK:");
+    print("ENDING STACK:");
     Edge curr;
     while (!stack.empty()) {
       curr = (Edge)stack.pop();
-      p.print("  " + curr.toString() + "\n");
+      print("  " + curr.toString() + "\n");
       add(curr.a.x(), curr.a.y());
     }
     closed = true;
-    lineColor = Color.GREEN;
+    lineColor = 0x00ff00; // green
   }
 
   // No first class functions, therefore this:
@@ -206,8 +204,8 @@ public class Polygon {
   GeoPoint visibleGeoPoint;
   
   int findVisibleEdge(GeoPoint pos, float theta) {  
-    //GeoPoint fake = new GeoPoint(getMaxX().x * 2 * p.cos(theta), getMaxY().y * 2 * p.sin(theta));
-    return findVisibleEdge(pos, new GeoPoint(vp, 10 * p.cos(theta), 10 * p.sin(theta)));
+    //GeoPoint fake = new GeoPoint(getMaxX().x * 2 * cos(theta), getMaxY().y * 2 * sin(theta));
+    return findVisibleEdge(pos, new GeoPoint(vp, 10 * cos(theta), 10 * sin(theta)));
   }
 
   int findVisibleEdge(GeoPoint pos, GeoPoint fake) {
@@ -217,8 +215,8 @@ public class Polygon {
     float dist;
     for (int i = 0; i < points.size(); i++) {
       b = getGeoPoint(i); c = getGeoPoint(i+1);
-      if (GeoPoint.segmentsIntersect(pos, fake, b, c)) {
-        inter = GeoPoint.lineIntersect(pos, fake, b, c);
+      if (pos.segmentsIntersect(fake, b, c)) {
+        inter = pos.lineIntersect(pos, fake, b, c);
         dist = pos.distance(inter);
         if (dist < min) {
           minGeoPoint = i;
@@ -237,7 +235,7 @@ public class Polygon {
   boolean isGeoPointVisible(GeoPoint pos, GeoPoint curr) {
     for (int j = 0; j < points.size(); j++) {
       if (getGeoPoint(j) == curr || getGeoPoint(j + 1) == curr) continue; // skip edges involving current point
-      if (GeoPoint.segmentsIntersect(pos, curr, getGeoPoint(j), getGeoPoint(j+1))) return false;
+      if (pos.segmentsIntersect(curr, getGeoPoint(j), getGeoPoint(j+1))) return false;
     }
     return true;
   }
@@ -270,12 +268,12 @@ public class Polygon {
     GeoPoint a,b,fake;
     ArrayList<GeoPoint> intersections = new ArrayList<GeoPoint>();
     float theta = curr.polarTheta(pos);
-    fake = new GeoPoint(0 - 10 * p.cos(theta), 0 - 10 * p.sin(theta));
+    fake = new GeoPoint(0 - 10 * cos(theta), 0 - 10 * sin(theta));
     for (int i = 0; i < points.size(); i++) {
       a = getGeoPoint(i); b = getGeoPoint(i+1);
       if (curr == a || curr == b) continue;
-      if (GeoPoint.segmentsIntersect(pos, fake, a, b)) {
-        GeoPoint inter = GeoPoint.lineIntersect(pos, fake, a, b);
+      if (pos.segmentsIntersect(fake, a, b)) {
+        GeoPoint inter = pos.lineIntersect(pos, fake, a, b);
         inter.setViewport(vp);
         intersections.add(inter);
       }
@@ -315,7 +313,7 @@ public class Polygon {
       nextInSorted = getGeoPoint(visGeoPoints, i + 1);
       nextInPoly = getGeoPoint(indexOf(curr) + 1);
       if (nextInPoly == nextInSorted) continue;
-      p.print(p.str(curr.unique_name) + ", " + p.str(nextInSorted.unique_name) + ", " + p.str(nextInPoly.unique_name) + "\n");
+      print(str(curr.unique_name) + ", " + str(nextInSorted.unique_name) + ", " + str(nextInPoly.unique_name) + "\n");
       turn0 = isSameTurn(pos, curr, nextInPoly);
       turn1 = isSameTurn(pos, curr, nextInSorted);
       if (turn0 == turn1) { // segment crosses the void cone - make single window point on it
@@ -332,11 +330,15 @@ public class Polygon {
   Polygon computeVisibility(GeoPoint pos) {
     _left_turn = true;
     ArrayList<GeoPoint> visGeoPoints = findVisibleGeoPoints(pos);
-    Collections.sort(visGeoPoints, GeoPoint.Comparators.getPolarTheta(pos));
+    
+    // SORT
+    mergesort(visGeoPoints, POLAR_THETA_METHOD, pos);
+    //Collections.sort(visGeoPoints, GeoPoint.Comparators.getPolarTheta(pos));
+    
     visGeoPoints = insertWindows(pos, visGeoPoints);
 
     Polygon visPoly = new Polygon(this.vp, visGeoPoints);
-    visPoly.lineColor = Color.GREEN;
+    visPoly.lineColor = 0x00ff00; // green
     visPoly.closed = true;
     return visPoly;
   }
@@ -466,13 +468,13 @@ public class Polygon {
     VisState state = VisState.FORWARD;
     
     // Find first visible edge in arbitrary direction:
-    //int end = findVisibleEdge(pos, (float)(p.PI / 2.0));
+    //int end = findVisibleEdge(pos, (float)(PI / 2.0));
     //GeoPoint endVisibleGeoPoint = visibleGeoPoint;
     int start = findVisibleEdge(pos, 0);
 
     // Determine which way we are rotating:
     _left_turn = pos.isLeftTurn(visibleGeoPoint, getGeoPoint(start + 1));
-    p.print("_left_turn = " + p.str(_left_turn) + "\n");
+    print("_left_turn = " + str(_left_turn) + "\n");
 
     Stack stack = new Stack<Edge>();
     //stack.push(new Edge(vp, pos, visibleGeoPoint));
@@ -483,7 +485,7 @@ public class Polygon {
       b = getGeoPoint(i);
       c = getGeoPoint(i + 1);
       if (isSameTurn(pos, b, c)) {
-        //p.print("isLeftTurn(" + pos.toString() + ", " + b.toString() + ", " + c.toString() + ") => TRUE\n");
+        //print("isLeftTurn(" + pos.toString() + ", " + b.toString() + ", " + c.toString() + ") => TRUE\n");
         if (state == VisState.FORWARD) {
           // Already moving forward - add the new edge to our stack:
           stack.push(new Edge(vp, b, c));
@@ -513,7 +515,7 @@ public class Polygon {
             do {
               // Keep popping until we see a right turn (i.e. visible 
               lastPopped = (Edge)stack.pop();
-              p.print("pop(" + lastPopped.toString() + ") - \n");
+              print("pop(" + lastPopped.toString() + ") - \n");
               peekEdge = null;
               if (stack.empty()) break; // Nothing visible - stop popping? TODO: bad...
               peekEdge = (Edge)stack.peek();

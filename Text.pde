@@ -3,7 +3,6 @@ import processing.core.*;
 public class Text {
   
   Viewport vp;
-  PApplet p;
   Space space;
 
   Button bckBtn; // Go back
@@ -11,7 +10,6 @@ public class Text {
 
   Text(Viewport vp, Space s) {
     this.vp = vp;
-    this.p = vp.p;
     this.space = s;
 
     Viewport bckVP = new Viewport(vp, 0.01, 0.90, 0.48, 0.09);

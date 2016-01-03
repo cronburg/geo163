@@ -1,11 +1,10 @@
-import processing.core.*;
-import java.awt.Color;
+//import processing.core.*;
+//import java.awt.Color;
 
 public class Space {
 
   Viewport vp;     // This viewport is locked to the screen where it is initialized.
   
-  PApplet p;
   State state;
 
   Polygon room; // The room with all the art!
@@ -18,7 +17,6 @@ public class Space {
 
   Space(Viewport vp) {
     this.vp = vp;
-    this.p = vp.p;
     this.state = State.SELECT;
     this.room = new Polygon(vp);
     this.mousePoint = new GeoPoint(vp, (float)0.0, (float)0.0);
@@ -32,10 +30,10 @@ public class Space {
       state = State.MAKEGUARD;
     } else if (room.badTentative) {
       // TODO: Put this in a text box:
-      p.print("Hey! That line intersects with an existing one ");
-      p.print("or is too close to another point. Try again.\n");
+      print("Hey! That line intersects with an existing one ");
+      print("or is too close to another point. Try again.\n");
     } else {
-      GeoPoint lastPoint = GeoPoint.newAbsGeoPoint(vp, p.mouseX, p.mouseY);
+      GeoPoint lastPoint = newAbsGeoPoint(vp, mouseX, mouseY);
       //lastPoint.setHover(true);
       lastPoint.setLabel(true);
       room.add(lastPoint);
@@ -57,7 +55,7 @@ public class Space {
       guard.pos.setConstraint(room); // Constrain the guard's position to be inside the polygon
       updateVisibility();
     } else {
-      p.print("The selected point is not inside the polygon. Please try again.\n");
+      print("The selected point is not inside the polygon. Please try again.\n");
     }
   }
 
@@ -75,13 +73,13 @@ public class Space {
 
   void draw() {
     vp.drawBorder();
-    mousePoint.setAbsX(p.mouseX);
-    mousePoint.setAbsY(p.mouseY);
+    mousePoint.setAbsX(mouseX);
+    mousePoint.setAbsY(mouseY);
     if (vp.containsMouse()) {
       if (state == State.SELECT) {
         mousePoint.draw(Palette.get(3,3));
         if (room.points.size() > 0) {
-          mousePoint.drawLineTo(room.points.get(room.points.size() - 1), Color.BLACK);
+          mousePoint.drawLineTo(room.points.get(room.points.size() - 1), 0x000000);
         }
       } else if (state == State.MAKEGUARD) {
         if (room.contains(mousePoint)) {
@@ -99,10 +97,10 @@ public class Space {
 
   void keyPressed(int keyCode) {
     if (state == State.COMPUTE_VIS) {
-      if      (p.UP    == keyCode) guard.goUp();
-      else if (p.DOWN  == keyCode) guard.goDown();
-      else if (p.LEFT  == keyCode) guard.goLeft();
-      else if (p.RIGHT == keyCode) guard.goRight();
+      if      (UP    == keyCode) guard.goUp();
+      else if (DOWN  == keyCode) guard.goDown();
+      else if (LEFT  == keyCode) guard.goLeft();
+      else if (RIGHT == keyCode) guard.goRight();
       
       updateVisibility();
     }
